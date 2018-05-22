@@ -1,0 +1,142 @@
+---
+title: "Analysis"
+author: "Amalie H L Sørensen"
+date: "22/5/2018"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Libraries
+```{r}
+library(rethinking)
+library(rstan)
+library(plyr)
+library(brmstools)
+```
+
+
+Data-clean
+```{r}
+d <- read.csv("~/Desktop/firstrun.csv", sep="")
+d = read.csv("~/Desktop/firstrealrun.csv", sep="")
+
+d <- d[, c(1,2,4,6,8,10,12,14,16,18)]
+colnames(d) <- c('run', 'flocking','movementdecrease','ticks','nofriends','lonely','mean_linkweight','mean_friends','sd_linkweight','sd_friends')
+```
+
+
+Boxplots - nofriends
+```{r}
+#Friend-score 0
+
+#Flockbehaviour
+boxplot(d$count.turtles.with..friends.score...0. ~ d$flock.behavior)
+
+#Flockbehaviour when movementdecrease off
+boxplot(d$count.turtles.with..friends.score...0.[d$movement.decrease == "false"] ~ d$flock.behavior[d$movement.decrease == "false"])
+
+#Flockbehaviour when movementdecrease on
+boxplot(d$count.turtles.with..friends.score...0.[d$movement.decrease == "true"] ~ d$flock.behavior[d$movement.decrease == "true"])
+
+#Movement
+boxplot(d$count.turtles.with..friends.score...0. ~ d$movement.decrease)
+
+#Movement when flockbehaviour off
+boxplot(d$count.turtles.with..friends.score...0.[d$flock.behavior == "false"] ~ d$movement.decrease[d$flock.behavior == "false"])
+
+#Movement when flockbehaviour on
+boxplot(d$count.turtles.with..friends.score...0.[d$flock.behavior == "true"] ~ d$movement.decrease[d$flock.behavior == "true"])
+```
+
+
+Boxplots - lonely
+```{r}
+#Lonely turtles - link weight
+
+#Flockbehaviour
+boxplot(d$count.turtles.with..lonely....true. ~ d$flock.behavior)
+
+#Flockbehaviour when movementdecrease off
+boxplot(d$count.turtles.with..lonely....true.[d$movement.decrease == "false"] ~ d$flock.behavior[d$movement.decrease == "false"])
+
+#Flockbehaviour when movementdecrease on
+boxplot(d$count.turtles.with..lonely....true.[d$movement.decrease == "true"] ~ d$flock.behavior[d$movement.decrease == "true"])
+
+#Movement
+boxplot(d$count.turtles.with..lonely....true. ~ d$movement.decrease)
+
+#Movement when flockbehaviour off
+boxplot(d$count.turtles.with..lonely....true.[d$flock.behavior == "false"] ~ d$movement.decrease[d$flock.behavior == "false"])
+
+#Movement when flockbehaviour on
+boxplot(d$count.turtles.with..lonely....true.[d$flock.behavior == "true"] ~ d$movement.decrease[d$flock.behavior == "true"])
+
+```
+
+
+Models - nofriends
+```{r}
+nofriends1=brm(nofriends~flocking,data=d,cores=2,chain=2,iter = 2000)
+stanplot(nofriends1)
+nofriends1_waic = WAIC(nofriends1)
+
+nofriends2=brm(nofriends~movementdecrease,data=d,cores=2,chain=2,iter = 2000)
+stanplot(nofriends2)
+nofriends2_waic = WAIC(nofriends2)
+
+nofriends3 = brm(nofriends~flocking + movementdecrease,data=d,cores=2,chain=2,iter = 2000)
+stanplot(nofriends3)
+nofriends3_waic = WAIC(nofriends3)
+
+nofriends4 = brm(nofriends~flocking * movementdecrease,data=d,cores=2,chain=2,iter = 2000)
+stanplot(nofriends4)
+nofriends4_waic = WAIC(nofriends4)
+
+compare_ic(nofriends1_waic,nofriends2_waic,nofriends3_waic,nofriends4_waic)
+
+```
+
+Models - lonely
+```{r}
+lonely1=brm(lonely~flocking,data=d,cores=2,chain=2,iter = 2000)
+stanplot(lonely1)
+lonely1_waic = WAIC(lonely1)
+
+lonely2=brm(lonely~movementdecrease,data=d,cores=2,chain=2,iter = 2000)
+stanplot(lonely2)
+lonely2_waic = WAIC(lonely2)
+
+lonely3 = brm(lonely~flocking + movementdecrease,data=d,cores=2,chain=2,iter = 2000)
+stanplot(lonely3)
+lonely3_waic = WAIC(lonely3)
+
+lonely4 = brm(lonely~flocking * movementdecrease,data=d,cores=2,chain=2,iter = 2000)
+stanplot(lonely4)
+lonely4_waic = WAIC(lonely4)
+
+compare_ic(lonely1_waic,lonely2_waic,lonely3_waic,lonely4_waic)
+```
+
+
+Models - sd
+```{r}
+sd_link = brm(sd_linkweight~flocking, data=d,cores=2,chain=2,iter = 2000)
+stanplot(sd_link)
+
+sd_friends = brm(sd_friends~flocking, data=d,cores=2,chain=2,iter = 2000)
+stanplot(sd_friends)
+```
+
+
+
+
+
+
+
+
+
+
+
