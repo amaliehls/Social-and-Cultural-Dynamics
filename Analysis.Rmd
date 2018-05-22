@@ -25,6 +25,9 @@ d = read.csv("~/Desktop/firstrealrun.csv", sep="")
 
 d <- d[, c(1,2,4,6,8,10,12,14,16,18)]
 colnames(d) <- c('run', 'flocking','movementdecrease','ticks','nofriends','lonely','mean_linkweight','mean_friends','sd_linkweight','sd_friends')
+
+#d$lonely=ordered(d$lonely)
+#d$nofriends=ordered(d$nofriends)
 ```
 
 
@@ -131,6 +134,37 @@ stanplot(sd_friends)
 ```
 
 
+Interaction plots
+
+```{r}
+line_flock = ggplot(d, aes(flocking, lonely, color = movementdecrease, group = movementdecrease))+
+  geom_point(stat = "summary", fun.y=mean)+
+  stat_summary(fun.y=mean, geom="line", aes(group = movementdecrease))+  
+  geom_errorbar(stat="summary", fun.data= mean_se, width=0.1)
+line_flock
+
+
+line_move = ggplot(d, aes(movementdecrease, lonely, color = flocking, group = flocking))+
+  geom_point(stat = "summary", fun.y=mean)+
+  stat_summary(fun.y=mean, geom="line", aes(group = flocking))+  
+  geom_errorbar(stat="summary", fun.data= mean_se, width=0.1)
+line_move
+
+
+
+
+
+
+#poterior predictive plot on top of raw data
+dens(sim.interaction, col = "red", xlim = c(-5, 5), ylim = c(0,1),  xlab = "nofriends")
+par(new=TRUE)
+dens(d$nofriends, xlim = c(-5, 5), ylim = c(0,1), xlab = "nofriends")
+title("nofriends predicted ~ flock/move interaction")
+
+posterior_samples(nofriends1, pars = NA, exact_match = FALSE,
+  add_chain = FALSE, subset = NULL, as.matrix = FALSE, as.array = FALSE,
+  ...)
+```
 
 
 
