@@ -24,14 +24,14 @@ d <- read.csv("~/Desktop/firstrun.csv", sep="")
 d = read.csv("~/Desktop/firstrealrun.csv", sep="")
 
 d <- d[, c(1,2,4,6,8,10,12,14,16,18)]
-colnames(d) <- c('run', 'flocking','movementdecrease','ticks','nofriends','lonely','mean_linkweight','mean_friends','sd_linkweight','sd_friends')
+colnames(d) <- c('run', 'flocking','movementdecrease','ticks','nolinks','lonely','mean_linkweight','mean_friends','sd_linkweight','sd_friends')
 
 #d$lonely=ordered(d$lonely)
-#d$nofriends=ordered(d$nofriends)
+#d$nolinks=ordered(d$nolinks)
 ```
 
 
-Boxplots - nofriends
+Boxplots - nolinks
 ```{r}
 #Friend-score 0
 
@@ -80,25 +80,25 @@ boxplot(d$count.turtles.with..lonely....true.[d$flock.behavior == "true"] ~ d$mo
 ```
 
 
-Models - nofriends
+Models - nolinks
 ```{r}
-nofriends1=brm(nofriends~flocking,data=d,cores=2,chain=2,iter = 2000)
-stanplot(nofriends1)
-nofriends1_waic = WAIC(nofriends1)
+nolinks1=brm(nolinks~flocking,data=d,cores=2,chain=2,iter = 2000)
+stanplot(nolinks1)
+nolinks1_waic = WAIC(nolinks1)
 
-nofriends2=brm(nofriends~movementdecrease,data=d,cores=2,chain=2,iter = 2000)
-stanplot(nofriends2)
-nofriends2_waic = WAIC(nofriends2)
+nolinks2=brm(nolinks~movementdecrease,data=d,cores=2,chain=2,iter = 2000)
+stanplot(nolinks2)
+nolinks2_waic = WAIC(nolinks2)
 
-nofriends3 = brm(nofriends~flocking + movementdecrease,data=d,cores=2,chain=2,iter = 2000)
-stanplot(nofriends3)
-nofriends3_waic = WAIC(nofriends3)
+nolinks3 = brm(nolinks~flocking + movementdecrease,data=d,cores=2,chain=2,iter = 2000)
+stanplot(nolinks3)
+nolinks3_waic = WAIC(nolinks3)
 
-nofriends4 = brm(nofriends~flocking * movementdecrease,data=d,cores=2,chain=2,iter = 2000)
-stanplot(nofriends4)
-nofriends4_waic = WAIC(nofriends4)
+nolinks4 = brm(nolinks~flocking * movementdecrease,data=d,cores=2,chain=2,iter = 2000)
+stanplot(nolinks4)
+nolinks4_waic = WAIC(nolinks4)
 
-compare_ic(nofriends1_waic,nofriends2_waic,nofriends3_waic,nofriends4_waic)
+compare_ic(nolinks1_waic,nolinks2_waic,nolinks3_waic,nolinks4_waic)
 
 ```
 
@@ -153,15 +153,13 @@ line_move
 
 
 
-
-
 #poterior predictive plot on top of raw data
-dens(sim.interaction, col = "red", xlim = c(-5, 5), ylim = c(0,1),  xlab = "nofriends")
+dens(sim.interaction, col = "red", xlim = c(-5, 5), ylim = c(0,1),  xlab = "nolinks")
 par(new=TRUE)
-dens(d$nofriends, xlim = c(-5, 5), ylim = c(0,1), xlab = "nofriends")
-title("nofriends predicted ~ flock/move interaction")
+dens(d$nolinks, xlim = c(-5, 5), ylim = c(0,1), xlab = "nolinks")
+title("nolinks predicted ~ flock/move interaction")
 
-posterior_samples(nofriends1, pars = NA, exact_match = FALSE,
+posterior_samples(nolinks1, pars = NA, exact_match = FALSE,
   add_chain = FALSE, subset = NULL, as.matrix = FALSE, as.array = FALSE,
   ...)
 ```
